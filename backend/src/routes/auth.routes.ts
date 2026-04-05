@@ -1,4 +1,4 @@
-import { Response, Router } from "express";
+import { CookieOptions, Response, Router } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../utils/token";
@@ -7,16 +7,20 @@ import { validateLoginBody, validateRegisterBody } from "../validators/auth";
 
 const authRouter = Router();
 
-const refreshCookieOptions = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: false,
-  path: "/",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
+function getRefreshCookieOptions(): CookieOptions {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+}
 
 function setRefreshTokenCookie(response: Response, token: string) {
-  response.cookie("refreshToken", token, refreshCookieOptions);
+  response.cookie("refreshToken", token, getRefreshCookieOptions());
 }
 
 authRouter.post("/register", async (request, response, next) => {
@@ -184,7 +188,7 @@ authRouter.post("/logout", async (request, response, next) => {
       });
     }
 
-    response.clearCookie("refreshToken", refreshCookieOptions);
+    response.clearCookie("refreshToken", getRefreshCookieOptions());
     response.json({
       message: "Logout successful.",
     });
