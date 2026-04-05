@@ -2,7 +2,7 @@
 
 A beginner-friendly full stack task management system built with:
 
-- Backend: Node.js, Express, TypeScript, Prisma, SQLite, JWT
+- Backend: Node.js, Express, TypeScript, Prisma, MySQL, JWT
 - Frontend: Next.js (App Router), TypeScript
 
 ## Project structure
@@ -24,20 +24,30 @@ npm install
 copy backend\\.env.example backend\\.env
 ```
 
-3. Create the database:
+3. Update `backend/.env` with your MySQL username, password, host, port, and database name.
+
+Example:
+
+```env
+DATABASE_URL="mysql://root:password@localhost:3306/task_management"
+```
+
+4. Create the database in MySQL if it does not already exist.
+
+5. Generate Prisma client and run migrations:
 
 ```bash
 npm run prisma:generate --workspace backend
 npm run prisma:migrate --workspace backend -- --name init
 ```
 
-4. Start the backend:
+6. Start the backend:
 
 ```bash
 npm run dev:backend
 ```
 
-5. Start the frontend in another terminal:
+7. Start the frontend in another terminal:
 
 ```bash
 npm run dev:frontend
